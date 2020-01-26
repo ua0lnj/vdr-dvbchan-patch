@@ -479,9 +479,49 @@ diff -Nupr vdr-2.4.1/nit.c vdr-2.4.1-mod/nit.c
                                    ChannelsModified |= Channel->SetLcn(lcn);
                                    break;
                                    }
+diff -Nupr vdr-2.4.1/pat.c vdr-2.4.1-mod/pat.c
+--- vdr-2.4.1/pat.c	2019-03-15 23:13:40.013287744 +1000
++++ vdr-2.4.1-mod/pat.c	2020-01-26 15:42:19.436230561 +1000
+@@ -432,6 +432,9 @@ void cPatFilter::Process(u_short Pid, u_
+               case 2: // STREAMTYPE_13818_VIDEO
+               case 0x1B: // H.264
+               case 0x24: // H.265
++              case 0x42: // AVS+
++              case 0x43: // AVS2
++              case 0xD2: // AVS2
+                       Vpid = esPid;
+                       Ppid = pmt.getPCRPid();
+                       Vtype = stream.getStreamType();
+@@ -439,6 +442,7 @@ void cPatFilter::Process(u_short Pid, u_
+                       break;
+               case 3: // STREAMTYPE_11172_AUDIO
+               case 4: // STREAMTYPE_13818_AUDIO
++              case 0x05: // STREAMTYPE 0x44524131 DRA1
+               case 0x0F: // ISO/IEC 13818-7 Audio with ADTS transport syntax
+               case 0x11: // ISO/IEC 14496-3 Audio with LATM transport syntax
+                       {
+@@ -474,7 +478,7 @@ void cPatFilter::Process(u_short Pid, u_
+                       ProcessCaDescriptors = true;
+                       }
+                       break;
+-              case 5: // STREAMTYPE_13818_PRIVATE
++//              case 5: // STREAMTYPE_13818_PRIVATE
+               case 6: // STREAMTYPE_13818_PES_PRIVATE
+               //XXX case 8: // STREAMTYPE_13818_DSMCC
+                       {
+@@ -577,7 +581,8 @@ void cPatFilter::Process(u_short Pid, u_
+                          }
+                       // fall through
+               case 0x83 ... 0x86: // STREAMTYPE_USER_PRIVATE
+-              case 0x88 ... 0xFF: // STREAMTYPE_USER_PRIVATE
++              case 0x88 ... 0xD1: // STREAMTYPE_USER_PRIVATE
++              case 0xD3 ... 0xFF: // STREAMTYPE_USER_PRIVATE
+                       {
+                       char lang[MAXLANGCODE1] = { 0 };
+                       bool IsAc3 = false;
 diff -Nupr vdr-2.4.1/po/ru_RU.po vdr-2.4.1-mod/po/ru_RU.po
 --- vdr-2.4.1/po/ru_RU.po	2018-04-10 23:22:28.013287744 +1000
-+++ vdr-2.4.1-mod/po/ru_RU.po	2019-06-18 12:15:49.575931720 +1000
++++ vdr-2.4.1-mod/po/ru_RU.po	2020-01-26 01:23:35.627452583 +1000
 @@ -1057,6 +1057,9 @@ msgstr "Широкоэкранное и�
  msgid "Setup.DVB$Use Dolby Digital"
  msgstr "Включить Dolby Digital"
@@ -502,6 +542,110 @@ diff -Nupr vdr-2.4.1/po/ru_RU.po vdr-2.4.1-mod/po/ru_RU.po
  msgid "LNB"
  msgstr "Конвертер"
  
+diff -Nupr vdr-2.4.1/remux.c vdr-2.4.1-mod/remux.c
+--- vdr-2.4.1/remux.c	2019-03-15 23:13:40.013287744 +1000
++++ vdr-2.4.1-mod/remux.c	2020-01-26 15:40:00.497377940 +1000
+@@ -723,12 +723,16 @@ void cPatPmtParser::ParsePmt(const uchar
+            case 0x02: // STREAMTYPE_13818_VIDEO
+            case 0x1B: // H.264
+            case 0x24: // H.265
++           case 0x42: // AVS+
++           case 0x43: // AVS2
++           case 0xD2: // AVS2
+                       vpid = stream.getPid();
+                       vtype = stream.getStreamType();
+                       ppid = Pmt.getPCRPid();
+                       break;
+            case 0x03: // STREAMTYPE_11172_AUDIO
+            case 0x04: // STREAMTYPE_13818_AUDIO
++           case 0x05: // STREAMTYPE 0x44524131 DRA1
+            case 0x0F: // ISO/IEC 13818-7 Audio with ADTS transport syntax
+            case 0x11: // ISO/IEC 14496-3 Audio with LATM transport syntax
+                       {
+@@ -1610,6 +1614,61 @@ int cH265Parser::Parse(const uchar *Data
+   return tsPayload.Used();
+ }
+ 
++// --- cAVSParser -----------------------------------------------------------
++
++class cAVSParser : public cH264Parser {
++private:
++
++  enum eNalUnitType {
++    nutSeqStartCode      = 0xb0,
++    nutVidSeqEndCode     = 0xb1,
++    nutUserStartCode     = 0xb2,
++    nutPicIStartCode     = 0xb3,
++    nutUndefStartCode    = 0xb4,
++    nutExtStartCode      = 0xb5,
++    nutPicPBStartcode    = 0xb6,
++    nutVideoEditCode     = 0xb7,
++    };
++
++  int pic_found;
++public:
++  cAVSParser(void);
++  virtual int Parse(const uchar *Data, int Length, int Pid);
++  };
++
++cAVSParser::cAVSParser(void)
++:cH264Parser()
++{
++}
++
++int cAVSParser::Parse(const uchar *Data, int Length, int Pid)
++{
++  newFrame = independentFrame = false;
++  tsPayload.Setup(const_cast<uchar *>(Data), Length, Pid);
++  uchar NalUnitType;
++  if (TsPayloadStart(Data)) {
++     tsPayload.SkipPesHeader();
++     scanner = EMPTY_SCANNER;
++     }
++  for (;;) {
++      scanner = (scanner << 8) | GetByte(true);
++      if ((scanner & 0xFFFFFF00) == 0x00000100) { // NAL unit start
++         NalUnitType = scanner & 0xff;
++         if (NalUnitType == nutPicIStartCode)
++            independentFrame = true;
++         if (NalUnitType == nutPicPBStartcode || NalUnitType == nutPicIStartCode) {
++            newFrame = true;
++            tsPayload.Statistics();
++         }
++         break;
++      }
++      if (tsPayload.AtPayloadStart() // stop at any new payload start to have the buffer refilled if necessary
++         || tsPayload.Eof()) // or if we're out of data
++         break;
++      }
++  return tsPayload.Used();
++}
++
+ // --- cFrameDetector --------------------------------------------------------
+ 
+ cFrameDetector::cFrameDetector(int Pid, int Type)
+@@ -1636,7 +1695,7 @@ void cFrameDetector::SetPid(int Pid, int
+ {
+   pid = Pid;
+   type = Type;
+-  isVideo = type == 0x01 || type == 0x02 || type == 0x1B || type == 0x24; // MPEG 1, 2, H.264 or H.265
++  isVideo = type == 0x01 || type == 0x02 || type == 0x1B || type == 0x24 || type == 0x42 || type == 0xD2; // MPEG 1, 2, H.264 or H.265, СAVS or AVS2
+   delete parser;
+   parser = NULL;
+   if (type == 0x01 || type == 0x02)
+@@ -1645,7 +1704,11 @@ void cFrameDetector::SetPid(int Pid, int
+      parser = new cH264Parser;
+   else if (type == 0x24)
+      parser = new cH265Parser;
+-  else if (type == 0x03 || type == 0x04 || type == 0x06) // MPEG audio or AC3 audio
++//  else if (type == 0x42)
++//     parser = new cCAVSParser;
++  else if (type == 0xD2 || type == 0x42 || type == 0x43) //CAVS or AVS2
++     parser = new cAVSParser;
++  else if (type == 0x03 || type == 0x04 || type == 0x06 || type == 0x05) // MPEG audio or AC3 audio or DRA1
+      parser = new cAudioParser;
+   else if (type != 0)
+      esyslog("ERROR: unknown stream type %d (PID %d) in frame detector", type, pid);
 diff -Nupr vdr-2.4.1/sdt.c vdr-2.4.1-mod/sdt.c
 --- vdr-2.4.1/sdt.c	2015-08-02 21:33:23.013287744 +1000
 +++ vdr-2.4.1-mod/sdt.c	2019-06-18 12:15:49.575931720 +1000
