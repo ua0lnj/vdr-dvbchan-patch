@@ -481,7 +481,7 @@ diff -Nupr vdr-2.4.1/nit.c vdr-2.4.1-mod/nit.c
                                    }
 diff -Nupr vdr-2.4.1/pat.c vdr-2.4.1-mod/pat.c
 --- vdr-2.4.1/pat.c	2019-03-15 23:13:40.013287744 +1000
-+++ vdr-2.4.1-mod/pat.c	2020-01-26 15:42:19.436230561 +1000
++++ vdr-2.4.1-mod/pat.c	2020-01-26 15:56:23.588092558 +1000
 @@ -432,6 +432,9 @@ void cPatFilter::Process(u_short Pid, u_
                case 2: // STREAMTYPE_13818_VIDEO
                case 0x1B: // H.264
@@ -521,7 +521,7 @@ diff -Nupr vdr-2.4.1/pat.c vdr-2.4.1-mod/pat.c
                        bool IsAc3 = false;
 diff -Nupr vdr-2.4.1/po/ru_RU.po vdr-2.4.1-mod/po/ru_RU.po
 --- vdr-2.4.1/po/ru_RU.po	2018-04-10 23:22:28.013287744 +1000
-+++ vdr-2.4.1-mod/po/ru_RU.po	2020-01-26 01:23:35.627452583 +1000
++++ vdr-2.4.1-mod/po/ru_RU.po	2020-01-26 16:01:24.755522363 +1000
 @@ -1057,6 +1057,9 @@ msgstr "Широкоэкранное и�
  msgid "Setup.DVB$Use Dolby Digital"
  msgstr "Включить Dolby Digital"
@@ -544,7 +544,7 @@ diff -Nupr vdr-2.4.1/po/ru_RU.po vdr-2.4.1-mod/po/ru_RU.po
  
 diff -Nupr vdr-2.4.1/remux.c vdr-2.4.1-mod/remux.c
 --- vdr-2.4.1/remux.c	2019-03-15 23:13:40.013287744 +1000
-+++ vdr-2.4.1-mod/remux.c	2020-01-26 15:40:00.497377940 +1000
++++ vdr-2.4.1-mod/remux.c	2020-01-31 15:28:03.566446722 +1000
 @@ -723,12 +723,16 @@ void cPatPmtParser::ParsePmt(const uchar
             case 0x02: // STREAMTYPE_13818_VIDEO
             case 0x1B: // H.264
@@ -562,12 +562,11 @@ diff -Nupr vdr-2.4.1/remux.c vdr-2.4.1-mod/remux.c
             case 0x0F: // ISO/IEC 13818-7 Audio with ADTS transport syntax
             case 0x11: // ISO/IEC 14496-3 Audio with LATM transport syntax
                        {
-@@ -1610,6 +1614,61 @@ int cH265Parser::Parse(const uchar *Data
+@@ -1610,6 +1614,60 @@ int cH265Parser::Parse(const uchar *Data
    return tsPayload.Used();
  }
  
 +// --- cAVSParser -----------------------------------------------------------
-+
 +class cAVSParser : public cH264Parser {
 +private:
 +
@@ -606,9 +605,9 @@ diff -Nupr vdr-2.4.1/remux.c vdr-2.4.1-mod/remux.c
 +      scanner = (scanner << 8) | GetByte(true);
 +      if ((scanner & 0xFFFFFF00) == 0x00000100) { // NAL unit start
 +         NalUnitType = scanner & 0xff;
-+         if (NalUnitType == nutPicIStartCode)
-+            independentFrame = true;
-+         if (NalUnitType == nutPicPBStartcode || NalUnitType == nutPicIStartCode) {
++         if (NalUnitType == nutPicIStartCode || NalUnitType == nutPicPBStartcode) {
++            if (NalUnitType == nutPicIStartCode)
++                 independentFrame = true;
 +            newFrame = true;
 +            tsPayload.Statistics();
 +         }
@@ -624,7 +623,7 @@ diff -Nupr vdr-2.4.1/remux.c vdr-2.4.1-mod/remux.c
  // --- cFrameDetector --------------------------------------------------------
  
  cFrameDetector::cFrameDetector(int Pid, int Type)
-@@ -1636,7 +1695,7 @@ void cFrameDetector::SetPid(int Pid, int
+@@ -1636,7 +1694,7 @@ void cFrameDetector::SetPid(int Pid, int
  {
    pid = Pid;
    type = Type;
@@ -633,13 +632,11 @@ diff -Nupr vdr-2.4.1/remux.c vdr-2.4.1-mod/remux.c
    delete parser;
    parser = NULL;
    if (type == 0x01 || type == 0x02)
-@@ -1645,7 +1704,11 @@ void cFrameDetector::SetPid(int Pid, int
+@@ -1645,7 +1703,9 @@ void cFrameDetector::SetPid(int Pid, int
       parser = new cH264Parser;
    else if (type == 0x24)
       parser = new cH265Parser;
 -  else if (type == 0x03 || type == 0x04 || type == 0x06) // MPEG audio or AC3 audio
-+//  else if (type == 0x42)
-+//     parser = new cCAVSParser;
 +  else if (type == 0xD2 || type == 0x42 || type == 0x43) //CAVS or AVS2
 +     parser = new cAVSParser;
 +  else if (type == 0x03 || type == 0x04 || type == 0x06 || type == 0x05) // MPEG audio or AC3 audio or DRA1
