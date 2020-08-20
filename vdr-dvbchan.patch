@@ -1,15 +1,19 @@
-diff -Nupr vdr-2.4.1/channels.c vdr-2.4.1-mod/channels.c
---- vdr-2.4.1/channels.c	2017-06-11 01:08:56.013287744 +1000
-+++ vdr-2.4.1-mod/channels.c	2019-06-18 12:15:49.555931340 +1000
-@@ -146,6 +146,7 @@ int cChannel::Transponder(int Frequency,
+diff -Nupr vdr-2.4.4/channels.c vdr-2.4.4-mod/channels.c
+--- vdr-2.4.4/channels.c	2020-08-20 15:31:21.778902448 +1000
++++ vdr-2.4.4-mod/channels.c	2020-08-20 15:36:26.492645482 +1000
+@@ -146,8 +146,10 @@ int cChannel::Transponder(int Frequency,
  int cChannel::Transponder(void) const
  {
    int tf = frequency;
-+if(IsSat() || IsAtsc() || IsCable() || IsTerr())
-   while (tf > 20000)
+-  while (tf > 20000)
++  if (IsSat() || IsAtsc() || IsCable() || IsTerr()) {
++     while (tf > 20000)
          tf /= 1000;
++     }
    if (IsSat()) {
-@@ -867,19 +868,21 @@ void cChannels::DeleteDuplicateChannels(
+      const char *p = strpbrk(parameters, "HVLRhvlr"); // lowercase for backwards compatibility
+      if (p)
+@@ -867,19 +869,21 @@ void cChannels::DeleteDuplicateChannels(
    cChannelSorter *cs = ChannelSorter.First();
    while (cs) {
          cChannelSorter *Next = ChannelSorter.Next(cs);
@@ -33,7 +37,7 @@ diff -Nupr vdr-2.4.1/channels.c vdr-2.4.1-mod/channels.c
       channels.ReNumber();
       return true;
       }
-@@ -1027,6 +1030,7 @@ const cChannel *cChannels::GetByTranspon
+@@ -1046,6 +1050,7 @@ const cChannel *cChannels::GetByTranspon
  bool cChannels::HasUniqueChannelID(const cChannel *NewChannel, const cChannel *OldChannel) const
  {
    tChannelID NewChannelID = NewChannel->GetChannelID();
@@ -41,7 +45,7 @@ diff -Nupr vdr-2.4.1/channels.c vdr-2.4.1-mod/channels.c
    for (const cChannel *Channel = First(); Channel; Channel = Next(Channel)) {
        if (!Channel->GroupSep() && Channel != OldChannel && Channel->GetChannelID() == NewChannelID)
           return false;
-@@ -1096,11 +1100,11 @@ cChannel *cChannels::NewChannel(const cC
+@@ -1115,11 +1120,11 @@ cChannel *cChannels::NewChannel(const cC
  #define CHANNELMARKOBSOLETE "OBSOLETE"
  #define CHANNELTIMEOBSOLETE 3600 // seconds to wait before declaring a channel obsolete (in case it has actually been seen before)
  
@@ -55,10 +59,10 @@ diff -Nupr vdr-2.4.1/channels.c vdr-2.4.1-mod/channels.c
           int OldShowChannelNamesWithSource = Setup.ShowChannelNamesWithSource;
           Setup.ShowChannelNamesWithSource = 0;
           if (!endswith(Channel->Name(), CHANNELMARKOBSOLETE))
-diff -Nupr vdr-2.4.1/channels.h vdr-2.4.1-mod/channels.h
---- vdr-2.4.1/channels.h	2017-06-11 01:06:40.013287744 +1000
-+++ vdr-2.4.1-mod/channels.h	2019-06-18 12:15:49.555931340 +1000
-@@ -251,7 +251,7 @@ public:
+diff -Nupr vdr-2.4.4/channels.h vdr-2.4.4-mod/channels.h
+--- vdr-2.4.4/channels.h	2020-08-20 15:31:21.778902448 +1000
++++ vdr-2.4.4-mod/channels.h	2020-08-20 15:31:55.395519007 +1000
+@@ -252,7 +252,7 @@ public:
        ///< and will be set to the current value of the list's internal state variable upon
        ///< return from this function.
    cChannel *NewChannel(const cChannel *Transponder, const char *Name, const char *ShortName, const char *Provider, int Nid, int Tid, int Sid, int Rid = 0);
@@ -67,9 +71,9 @@ diff -Nupr vdr-2.4.1/channels.h vdr-2.4.1-mod/channels.h
    };
  
  // Provide lock controlled access to the list:
-diff -Nupr vdr-2.4.1/config.c vdr-2.4.1-mod/config.c
---- vdr-2.4.1/config.c	2018-02-16 00:40:36.013287744 +1000
-+++ vdr-2.4.1-mod/config.c	2019-06-18 12:15:49.555931340 +1000
+diff -Nupr vdr-2.4.4/config.c vdr-2.4.4-mod/config.c
+--- vdr-2.4.4/config.c	2020-08-20 15:31:21.782902521 +1000
++++ vdr-2.4.4-mod/config.c	2020-08-20 15:31:55.399519080 +1000
 @@ -440,8 +440,10 @@ cSetup::cSetup(void)
    ColorKey3 = 3;
    VideoDisplayFormat = 1;
@@ -103,9 +107,9 @@ diff -Nupr vdr-2.4.1/config.c vdr-2.4.1-mod/config.c
    Store("ChannelInfoPos",     ChannelInfoPos);
    Store("ChannelInfoTime",    ChannelInfoTime);
    Store("OSDLeftP",           OSDLeftP);
-diff -Nupr vdr-2.4.1/config.h vdr-2.4.1-mod/config.h
---- vdr-2.4.1/config.h	2019-06-16 19:13:45.013287744 +1000
-+++ vdr-2.4.1-mod/config.h	2019-06-18 12:15:49.555931340 +1000
+diff -Nupr vdr-2.4.4/config.h vdr-2.4.4-mod/config.h
+--- vdr-2.4.4/config.h	2020-08-20 15:31:21.782902521 +1000
++++ vdr-2.4.4-mod/config.h	2020-08-20 15:31:55.399519080 +1000
 @@ -311,8 +311,10 @@ public:
    int ColorKey0, ColorKey1, ColorKey2, ColorKey3;
    int VideoDisplayFormat;
@@ -117,10 +121,10 @@ diff -Nupr vdr-2.4.1/config.h vdr-2.4.1-mod/config.h
    int ChannelInfoPos;
    int ChannelInfoTime;
    double OSDLeftP, OSDTopP, OSDWidthP, OSDHeightP;
-diff -Nupr vdr-2.4.1/device.c vdr-2.4.1-mod/device.c
---- vdr-2.4.1/device.c	2019-05-29 01:55:44.013287744 +1000
-+++ vdr-2.4.1-mod/device.c	2019-06-18 12:15:49.555931340 +1000
-@@ -247,7 +247,7 @@ cDevice *cDevice::GetDevice(const cChann
+diff -Nupr vdr-2.4.4/device.c vdr-2.4.4-mod/device.c
+--- vdr-2.4.4/device.c	2020-08-20 15:31:21.782902521 +1000
++++ vdr-2.4.4-mod/device.c	2020-08-20 15:31:55.399519080 +1000
+@@ -252,7 +252,7 @@ cDevice *cDevice::GetDevice(const cChann
    int SlotPriority[NumCamSlots];
    int NumUsableSlots = 0;
    bool InternalCamNeeded = false;
@@ -129,9 +133,9 @@ diff -Nupr vdr-2.4.1/device.c vdr-2.4.1-mod/device.c
       for (cCamSlot *CamSlot = CamSlots.First(); CamSlot; CamSlot = CamSlots.Next(CamSlot)) {
           SlotPriority[CamSlot->Index()] = MAXPRIORITY + 1; // assumes it can't be used
           if (CamSlot->ModuleStatus() == msReady) {
-diff -Nupr vdr-2.4.1/dvbdevice.c vdr-2.4.1-mod/dvbdevice.c
---- vdr-2.4.1/dvbdevice.c	2019-05-29 01:55:44.013287744 +1000
-+++ vdr-2.4.1-mod/dvbdevice.c	2019-06-18 12:23:48.141024910 +1000
+diff -Nupr vdr-2.4.4/dvbdevice.c vdr-2.4.4-mod/dvbdevice.c
+--- vdr-2.4.4/dvbdevice.c	2020-08-20 15:31:21.786902596 +1000
++++ vdr-2.4.4-mod/dvbdevice.c	2020-08-20 15:31:55.399519080 +1000
 @@ -95,6 +95,8 @@ const tDvbParameterMap ModulationValues[
  
  #define DVB_SYSTEM_1 0 // see also nit.c
@@ -211,7 +215,7 @@ diff -Nupr vdr-2.4.1/dvbdevice.c vdr-2.4.1-mod/dvbdevice.c
       // DVB-T/DVB-T2 (common parts)
       SETCMD(DTV_FREQUENCY, FrequencyToHz(channel.Frequency()));
       SETCMD(DTV_INVERSION, dtp.Inversion());
-@@ -2167,7 +2180,8 @@ bool cDvbDevice::ProvidesSource(int Sour
+@@ -2176,7 +2189,8 @@ bool cDvbDevice::ProvidesSource(int Sour
        || type == cSource::stAtsc  && ProvidesDeliverySystem(SYS_ATSC)
        || type == cSource::stCable && (ProvidesDeliverySystem(SYS_DVBC_ANNEX_AC) || ProvidesDeliverySystem(SYS_DVBC_ANNEX_B))
        || type == cSource::stSat   && (ProvidesDeliverySystem(SYS_DVBS) || ProvidesDeliverySystem(SYS_DVBS2))
@@ -221,9 +225,9 @@ diff -Nupr vdr-2.4.1/dvbdevice.c vdr-2.4.1-mod/dvbdevice.c
  }
  
  bool cDvbDevice::ProvidesTransponder(const cChannel *Channel) const
-diff -Nupr vdr-2.4.1/eit.c vdr-2.4.1-mod/eit.c
---- vdr-2.4.1/eit.c	2019-05-22 07:25:00.013287744 +1000
-+++ vdr-2.4.1-mod/eit.c	2019-06-18 12:25:23.430835344 +1000
+diff -Nupr vdr-2.4.4/eit.c vdr-2.4.4-mod/eit.c
+--- vdr-2.4.4/eit.c	2020-08-20 15:31:21.786902596 +1000
++++ vdr-2.4.4-mod/eit.c	2020-08-20 15:31:55.399519080 +1000
 @@ -26,10 +26,10 @@
  
  class cEIT : public SI::EIT {
@@ -255,7 +259,7 @@ diff -Nupr vdr-2.4.1/eit.c vdr-2.4.1-mod/eit.c
                   if (!rSchedule)
                      break;
                   rEvent = (cEvent *)rSchedule->GetEvent(tsed->getReferenceEventId());
-@@ -444,7 +444,7 @@ void cEitFilter::Process(u_short Pid, u_
+@@ -450,7 +450,7 @@ void cEitFilter::Process(u_short Pid, u_
    switch (Pid) {
      case 0x12: {
           if (Tid >= 0x4E && Tid <= 0x6F)
@@ -264,9 +268,9 @@ diff -Nupr vdr-2.4.1/eit.c vdr-2.4.1-mod/eit.c
           }
           break;
      case 0x14: {
-diff -Nupr vdr-2.4.1/epg.c vdr-2.4.1-mod/epg.c
---- vdr-2.4.1/epg.c	2019-05-22 07:25:00.013287744 +1000
-+++ vdr-2.4.1-mod/epg.c	2019-06-18 12:15:49.567931569 +1000
+diff -Nupr vdr-2.4.4/epg.c vdr-2.4.4-mod/epg.c
+--- vdr-2.4.4/epg.c	2020-08-20 15:31:21.786902596 +1000
++++ vdr-2.4.4-mod/epg.c	2020-08-20 15:31:55.407519227 +1000
 @@ -906,9 +906,10 @@ Final:
  
  cMutex cSchedule::numTimersMutex;
@@ -341,9 +345,9 @@ diff -Nupr vdr-2.4.1/epg.c vdr-2.4.1-mod/epg.c
    if (!Channel->schedule)
       Channel->schedule = &DummySchedule;
    if (Channel->schedule == &DummySchedule && AddIfMissing) {
-diff -Nupr vdr-2.4.1/epg.h vdr-2.4.1-mod/epg.h
---- vdr-2.4.1/epg.h	2017-05-28 22:59:20.013287744 +1000
-+++ vdr-2.4.1-mod/epg.h	2019-06-18 12:15:49.567931569 +1000
+diff -Nupr vdr-2.4.4/epg.h vdr-2.4.4-mod/epg.h
+--- vdr-2.4.4/epg.h	2020-08-20 15:31:21.786902596 +1000
++++ vdr-2.4.4-mod/epg.h	2020-08-20 15:31:55.407519227 +1000
 @@ -151,6 +151,7 @@ class cSchedule : public cListObject  {
  private:
    static cMutex numTimersMutex; // Protects numTimers, because it might be accessed from parallel read locks
@@ -374,9 +378,9 @@ diff -Nupr vdr-2.4.1/epg.h vdr-2.4.1-mod/epg.h
    const cSchedule *GetSchedule(const cChannel *Channel, bool AddIfMissing = false) const;
    };
  
-diff -Nupr vdr-2.4.1/Make.config.template vdr-2.4.1-mod/Make.config.template
---- vdr-2.4.1/Make.config.template	2017-06-02 19:29:54.013287744 +1000
-+++ vdr-2.4.1-mod/Make.config.template	2019-06-18 12:15:49.567931569 +1000
+diff -Nupr vdr-2.4.4/Make.config.template vdr-2.4.4-mod/Make.config.template
+--- vdr-2.4.4/Make.config.template	2020-08-20 15:31:21.762902155 +1000
++++ vdr-2.4.4-mod/Make.config.template	2020-08-20 15:31:55.411519300 +1000
 @@ -90,6 +90,7 @@ LIRC_DEVICE = /var/run/lirc/lircd
  ### Define if you want 'systemd' notification:
  #SDNOTIFY = 1
@@ -385,10 +389,10 @@ diff -Nupr vdr-2.4.1/Make.config.template vdr-2.4.1-mod/Make.config.template
  ### Fallback for plugins with old makefiles:
  ifdef PLUGIN
  CFLAGS   += -fPIC
-diff -Nupr vdr-2.4.1/menu.c vdr-2.4.1-mod/menu.c
---- vdr-2.4.1/menu.c	2019-05-29 01:55:44.013287744 +1000
-+++ vdr-2.4.1-mod/menu.c	2019-06-18 12:15:49.571931646 +1000
-@@ -3687,6 +3687,7 @@ void cMenuSetupDVB::Setup(void)
+diff -Nupr vdr-2.4.4/menu.c vdr-2.4.4-mod/menu.c
+--- vdr-2.4.4/menu.c	2020-08-20 15:31:21.794902742 +1000
++++ vdr-2.4.4-mod/menu.c	2020-08-20 15:31:55.411519300 +1000
+@@ -3691,6 +3691,7 @@ void cMenuSetupDVB::Setup(void)
    if (data.VideoFormat == 0)
       Add(new cMenuEditStraItem(tr("Setup.DVB$Video display format"), &data.VideoDisplayFormat, 3, videoDisplayFormatTexts));
    Add(new cMenuEditBoolItem(tr("Setup.DVB$Use Dolby Digital"),     &data.UseDolbyDigital));
@@ -396,7 +400,7 @@ diff -Nupr vdr-2.4.1/menu.c vdr-2.4.1-mod/menu.c
    Add(new cMenuEditStraItem(tr("Setup.DVB$Update channels"),       &data.UpdateChannels, 6, updateChannelsTexts));
    Add(new cMenuEditIntItem( tr("Setup.DVB$Audio languages"),       &numAudioLanguages, 0, I18nLanguages()->Size()));
    for (int i = 0; i < numAudioLanguages; i++)
-@@ -3700,6 +3701,7 @@ void cMenuSetupDVB::Setup(void)
+@@ -3704,6 +3705,7 @@ void cMenuSetupDVB::Setup(void)
       Add(new cMenuEditIntItem( tr("Setup.DVB$Subtitle foreground transparency"), &data.SubtitleFgTransparency, 0, 9));
       Add(new cMenuEditIntItem( tr("Setup.DVB$Subtitle background transparency"), &data.SubtitleBgTransparency, 0, 10));
       }
@@ -404,9 +408,9 @@ diff -Nupr vdr-2.4.1/menu.c vdr-2.4.1-mod/menu.c
  
    SetCurrent(Get(current));
    Display();
-diff -Nupr vdr-2.4.1/nit.c vdr-2.4.1-mod/nit.c
---- vdr-2.4.1/nit.c	2019-06-01 07:47:02.013287744 +1000
-+++ vdr-2.4.1-mod/nit.c	2019-06-18 12:15:49.575931720 +1000
+diff -Nupr vdr-2.4.4/nit.c vdr-2.4.4-mod/nit.c
+--- vdr-2.4.4/nit.c	2020-08-20 15:31:21.794902742 +1000
++++ vdr-2.4.4-mod/nit.c	2020-08-20 15:31:55.411519300 +1000
 @@ -18,6 +18,8 @@
  
  #define DVB_SYSTEM_1 0 // see also dvbdevice.c
@@ -479,10 +483,10 @@ diff -Nupr vdr-2.4.1/nit.c vdr-2.4.1-mod/nit.c
                                    ChannelsModified |= Channel->SetLcn(lcn);
                                    break;
                                    }
-diff -Nupr vdr-2.4.1/pat.c vdr-2.4.1-mod/pat.c
---- vdr-2.4.1/pat.c	2019-03-15 23:13:40.013287744 +1000
-+++ vdr-2.4.1-mod/pat.c	2020-01-26 15:56:23.588092558 +1000
-@@ -432,6 +432,9 @@ void cPatFilter::Process(u_short Pid, u_
+diff -Nupr vdr-2.4.4/pat.c vdr-2.4.4-mod/pat.c
+--- vdr-2.4.4/pat.c	2020-08-20 15:31:21.798902816 +1000
++++ vdr-2.4.4-mod/pat.c	2020-08-20 15:31:55.415519374 +1000
+@@ -522,6 +522,9 @@ void cPatFilter::Process(u_short Pid, u_
                case 2: // STREAMTYPE_13818_VIDEO
                case 0x1B: // H.264
                case 0x24: // H.265
@@ -492,7 +496,7 @@ diff -Nupr vdr-2.4.1/pat.c vdr-2.4.1-mod/pat.c
                        Vpid = esPid;
                        Ppid = pmt.getPCRPid();
                        Vtype = stream.getStreamType();
-@@ -439,6 +442,7 @@ void cPatFilter::Process(u_short Pid, u_
+@@ -529,6 +532,7 @@ void cPatFilter::Process(u_short Pid, u_
                        break;
                case 3: // STREAMTYPE_11172_AUDIO
                case 4: // STREAMTYPE_13818_AUDIO
@@ -500,7 +504,7 @@ diff -Nupr vdr-2.4.1/pat.c vdr-2.4.1-mod/pat.c
                case 0x0F: // ISO/IEC 13818-7 Audio with ADTS transport syntax
                case 0x11: // ISO/IEC 14496-3 Audio with LATM transport syntax
                        {
-@@ -474,7 +478,7 @@ void cPatFilter::Process(u_short Pid, u_
+@@ -564,7 +568,7 @@ void cPatFilter::Process(u_short Pid, u_
                        ProcessCaDescriptors = true;
                        }
                        break;
@@ -509,7 +513,7 @@ diff -Nupr vdr-2.4.1/pat.c vdr-2.4.1-mod/pat.c
                case 6: // STREAMTYPE_13818_PES_PRIVATE
                //XXX case 8: // STREAMTYPE_13818_DSMCC
                        {
-@@ -577,7 +581,8 @@ void cPatFilter::Process(u_short Pid, u_
+@@ -667,7 +671,8 @@ void cPatFilter::Process(u_short Pid, u_
                           }
                        // fall through
                case 0x83 ... 0x86: // STREAMTYPE_USER_PRIVATE
@@ -519,10 +523,10 @@ diff -Nupr vdr-2.4.1/pat.c vdr-2.4.1-mod/pat.c
                        {
                        char lang[MAXLANGCODE1] = { 0 };
                        bool IsAc3 = false;
-diff -Nupr vdr-2.4.1/po/ru_RU.po vdr-2.4.1-mod/po/ru_RU.po
---- vdr-2.4.1/po/ru_RU.po	2018-04-10 23:22:28.013287744 +1000
-+++ vdr-2.4.1-mod/po/ru_RU.po	2020-01-26 16:01:24.755522363 +1000
-@@ -1057,6 +1057,9 @@ msgstr "Широкоэкранное и�
+diff -Nupr vdr-2.4.4/po/ru_RU.po vdr-2.4.4-mod/po/ru_RU.po
+--- vdr-2.4.4/po/ru_RU.po	2020-08-20 15:31:21.806902962 +1000
++++ vdr-2.4.4-mod/po/ru_RU.po	2020-08-20 15:31:55.415519374 +1000
+@@ -1075,6 +1075,9 @@ msgstr "Широкоэкранное и�
  msgid "Setup.DVB$Use Dolby Digital"
  msgstr "Включить Dolby Digital"
  
@@ -532,7 +536,7 @@ diff -Nupr vdr-2.4.1/po/ru_RU.po vdr-2.4.1-mod/po/ru_RU.po
  msgid "Setup.DVB$Update channels"
  msgstr "Обновлять настройки каналов"
  
-@@ -1084,6 +1087,9 @@ msgstr "Прозрачность пер�
+@@ -1102,6 +1105,9 @@ msgstr "Прозрачность пер�
  msgid "Setup.DVB$Subtitle background transparency"
  msgstr "Прозрачность фона субтитров"
  
@@ -542,9 +546,9 @@ diff -Nupr vdr-2.4.1/po/ru_RU.po vdr-2.4.1-mod/po/ru_RU.po
  msgid "LNB"
  msgstr "Конвертер"
  
-diff -Nupr vdr-2.4.1/remux.c vdr-2.4.1-mod/remux.c
---- vdr-2.4.1/remux.c	2019-03-15 23:13:40.013287744 +1000
-+++ vdr-2.4.1-mod/remux.c	2020-01-31 15:28:03.566446722 +1000
+diff -Nupr vdr-2.4.4/remux.c vdr-2.4.4-mod/remux.c
+--- vdr-2.4.4/remux.c	2020-08-20 15:31:21.814903109 +1000
++++ vdr-2.4.4-mod/remux.c	2020-08-20 15:33:29.269240738 +1000
 @@ -723,12 +723,16 @@ void cPatPmtParser::ParsePmt(const uchar
             case 0x02: // STREAMTYPE_13818_VIDEO
             case 0x1B: // H.264
@@ -623,16 +627,17 @@ diff -Nupr vdr-2.4.1/remux.c vdr-2.4.1-mod/remux.c
  // --- cFrameDetector --------------------------------------------------------
  
  cFrameDetector::cFrameDetector(int Pid, int Type)
-@@ -1636,7 +1694,7 @@ void cFrameDetector::SetPid(int Pid, int
+@@ -1636,7 +1694,8 @@ void cFrameDetector::SetPid(int Pid, int
  {
    pid = Pid;
    type = Type;
 -  isVideo = type == 0x01 || type == 0x02 || type == 0x1B || type == 0x24; // MPEG 1, 2, H.264 or H.265
-+  isVideo = type == 0x01 || type == 0x02 || type == 0x1B || type == 0x24 || type == 0x42 || type == 0xD2; // MPEG 1, 2, H.264 or H.265, СAVS or AVS2
++  isVideo = type == 0x01 || type == 0x02 || type == 0x1B || type == 0x24 || type == 0x42 ||
++     type == 0x43 || type == 0xD2; // MPEG 1, 2, H.264 or H.265, СAVS or AVS2
    delete parser;
    parser = NULL;
    if (type == 0x01 || type == 0x02)
-@@ -1645,7 +1703,9 @@ void cFrameDetector::SetPid(int Pid, int
+@@ -1645,7 +1704,9 @@ void cFrameDetector::SetPid(int Pid, int
       parser = new cH264Parser;
    else if (type == 0x24)
       parser = new cH265Parser;
@@ -643,10 +648,10 @@ diff -Nupr vdr-2.4.1/remux.c vdr-2.4.1-mod/remux.c
       parser = new cAudioParser;
    else if (type != 0)
       esyslog("ERROR: unknown stream type %d (PID %d) in frame detector", type, pid);
-diff -Nupr vdr-2.4.1/sdt.c vdr-2.4.1-mod/sdt.c
---- vdr-2.4.1/sdt.c	2015-08-02 21:33:23.013287744 +1000
-+++ vdr-2.4.1-mod/sdt.c	2019-06-18 12:15:49.575931720 +1000
-@@ -62,7 +62,7 @@ void cSdtFilter::Process(u_short Pid, u_
+diff -Nupr vdr-2.4.4/sdt.c vdr-2.4.4-mod/sdt.c
+--- vdr-2.4.4/sdt.c	2020-08-20 15:31:21.814903109 +1000
++++ vdr-2.4.4-mod/sdt.c	2020-08-20 15:31:55.415519374 +1000
+@@ -94,7 +94,7 @@ void cSdtFilter::Process(u_short Pid, u_
    bool ChannelsModified = false;
    SI::SDT::Service SiSdtService;
    for (SI::Loop::Iterator it; sdt.serviceLoop.getNext(SiSdtService, it); ) {
@@ -655,7 +660,7 @@ diff -Nupr vdr-2.4.1/sdt.c vdr-2.4.1-mod/sdt.c
        if (!Channel)
           Channel = Channels->GetByChannelID(tChannelID(source, 0, Transponder(), SiSdtService.getServiceId()));
        if (Channel)
-@@ -106,7 +106,7 @@ void cSdtFilter::Process(u_short Pid, u_
+@@ -141,7 +141,7 @@ void cSdtFilter::Process(u_short Pid, u_
                          char *pp = compactspace(ProviderNameBuf);
                          if (Channel) {
                             ChannelsModified |= Channel->SetId(Channels, sdt.getOriginalNetworkId(), sdt.getTransportStreamId(), SiSdtService.getServiceId());
@@ -664,7 +669,7 @@ diff -Nupr vdr-2.4.1/sdt.c vdr-2.4.1-mod/sdt.c
                                ChannelsModified |= Channel->SetName(pn, ps, pp);
                             // Using SiSdtService.getFreeCaMode() is no good, because some
                             // tv stations set this flag even for non-encrypted channels :-(
-@@ -170,9 +170,9 @@ void cSdtFilter::Process(u_short Pid, u_
+@@ -205,9 +205,9 @@ void cSdtFilter::Process(u_short Pid, u_
        }
    if (sdt.getSectionNumber() == sdt.getLastSectionNumber()) {
       if (Setup.UpdateChannels == 1 || Setup.UpdateChannels >= 3) {
