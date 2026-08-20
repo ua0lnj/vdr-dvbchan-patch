@@ -2,5 +2,6 @@ This is a patch for vdr
 
 For incorrect dvb channels and bad providers
 
-Add DTMB and ISDB-T
-Add AVS and AVS2
+Added DTMB and ISDB-T
+Added AVS, AVS2, AVS3
+Added DRA

@@ -1,6 +1,6 @@
-diff -Nupr vdr-2.8.1/channels.c vdr-2.8.1-mod/channels.c
---- vdr-2.8.1/channels.c	2026-03-21 23:55:01.890729028 +1000
-+++ vdr-2.8.1-mod/channels.c	2026-03-21 23:55:52.357291313 +1000
+diff -Nupr 1/vdr-2.8.2/channels.c 2/vdr-2.8.2/channels.c
+--- 1/vdr-2.8.2/channels.c	2026-06-06 00:11:02.591477102 +1000
++++ 2/vdr-2.8.2/channels.c	2026-08-20 10:17:37.303998357 +1000
 @@ -155,8 +155,10 @@ int cChannel::Transponder(void) const
  {
    if (!transponder) {
@@ -59,9 +59,9 @@ diff -Nupr vdr-2.8.1/channels.c vdr-2.8.1-mod/channels.c
           int OldShowChannelNamesWithSource = Setup.ShowChannelNamesWithSource;
           Setup.ShowChannelNamesWithSource = 0;
           if (!endswith(Channel->Name(), CHANNELMARKOBSOLETE))
-diff -Nupr vdr-2.8.1/channels.h vdr-2.8.1-mod/channels.h
---- vdr-2.8.1/channels.h	2026-03-21 23:55:01.891728980 +1000
-+++ vdr-2.8.1-mod/channels.h	2026-03-21 23:55:52.358291265 +1000
+diff -Nupr 1/vdr-2.8.2/channels.h 2/vdr-2.8.2/channels.h
+--- 1/vdr-2.8.2/channels.h	2026-06-06 00:11:02.591477102 +1000
++++ 2/vdr-2.8.2/channels.h	2026-08-20 10:17:37.304998308 +1000
 @@ -255,7 +255,7 @@ public:
        ///< and will be set to the current value of the list's internal state variable upon
        ///< return from this function.
@@ -71,9 +71,9 @@ diff -Nupr vdr-2.8.1/channels.h vdr-2.8.1-mod/channels.h
    };
  
  // Provide lock controlled access to the list:
-diff -Nupr vdr-2.8.1/config.c vdr-2.8.1-mod/config.c
---- vdr-2.8.1/config.c	2026-03-21 23:55:01.892728932 +1000
-+++ vdr-2.8.1-mod/config.c	2026-03-21 23:55:52.360291169 +1000
+diff -Nupr 1/vdr-2.8.2/config.c 2/vdr-2.8.2/config.c
+--- 1/vdr-2.8.2/config.c	2026-06-06 00:11:02.592477052 +1000
++++ 2/vdr-2.8.2/config.c	2026-08-20 10:17:37.305998259 +1000
 @@ -443,8 +443,10 @@ cSetup::cSetup(void)
    ColorKey3 = 3;
    VideoDisplayFormat = 1;
@@ -107,9 +107,9 @@ diff -Nupr vdr-2.8.1/config.c vdr-2.8.1-mod/config.c
    Store("ChannelInfoPos",     ChannelInfoPos);
    Store("ChannelInfoTime",    ChannelInfoTime);
    Store("OSDLeftP",           OSDLeftP);
-diff -Nupr vdr-2.8.1/config.h vdr-2.8.1-mod/config.h
---- vdr-2.8.1/config.h	2026-03-21 23:55:01.892728932 +1000
-+++ vdr-2.8.1-mod/config.h	2026-03-21 23:55:52.360291169 +1000
+diff -Nupr 1/vdr-2.8.2/config.h 2/vdr-2.8.2/config.h
+--- 1/vdr-2.8.2/config.h	2026-06-06 00:11:02.592477052 +1000
++++ 2/vdr-2.8.2/config.h	2026-08-20 10:17:37.305998259 +1000
 @@ -330,8 +330,10 @@ public:
    int ColorKey0, ColorKey1, ColorKey2, ColorKey3;
    int VideoDisplayFormat;
@@ -121,9 +121,9 @@ diff -Nupr vdr-2.8.1/config.h vdr-2.8.1-mod/config.h
    int ChannelInfoPos;
    int ChannelInfoTime;
    double OSDLeftP, OSDTopP, OSDWidthP, OSDHeightP;
-diff -Nupr vdr-2.8.1/device.c vdr-2.8.1-mod/device.c
---- vdr-2.8.1/device.c	2026-03-21 23:55:01.894728835 +1000
-+++ vdr-2.8.1-mod/device.c	2026-03-21 23:55:52.361291120 +1000
+diff -Nupr 1/vdr-2.8.2/device.c 2/vdr-2.8.2/device.c
+--- 1/vdr-2.8.2/device.c	2026-06-06 00:11:02.593477002 +1000
++++ 2/vdr-2.8.2/device.c	2026-08-20 14:28:23.203475963 +1000
 @@ -254,7 +254,7 @@ cDevice *cDevice::GetDevice(const cChann
    int SlotPriority[NumCamSlots + 1]; // +1 to avoid a zero sized array in case there are no CAM slots
    int NumUsableSlots = 0;
@@ -133,9 +133,9 @@ diff -Nupr vdr-2.8.1/device.c vdr-2.8.1-mod/device.c
       for (cCamSlot *CamSlot = CamSlots.First(); CamSlot; CamSlot = CamSlots.Next(CamSlot)) {
           SlotPriority[CamSlot->Index()] = MAXPRIORITY + 1; // assumes it can't be used
           if (CamSlot->ModuleStatus() == msReady) {
-diff -Nupr vdr-2.8.1/dvbdevice.c vdr-2.8.1-mod/dvbdevice.c
---- vdr-2.8.1/dvbdevice.c	2026-03-21 23:55:01.895728787 +1000
-+++ vdr-2.8.1-mod/dvbdevice.c	2026-03-21 23:55:52.361291120 +1000
+diff -Nupr 1/vdr-2.8.2/dvbdevice.c 2/vdr-2.8.2/dvbdevice.c
+--- 1/vdr-2.8.2/dvbdevice.c	2026-06-06 00:11:02.594476951 +1000
++++ 2/vdr-2.8.2/dvbdevice.c	2026-08-20 10:17:37.306998210 +1000
 @@ -100,6 +100,8 @@ const tDvbParameterMap ModulationValues[
  
  #define DVB_SYSTEM_1 0 // see also nit.c
@@ -225,9 +225,9 @@ diff -Nupr vdr-2.8.1/dvbdevice.c vdr-2.8.1-mod/dvbdevice.c
  }
  
  bool cDvbDevice::ProvidesTransponder(const cChannel *Channel) const
-diff -Nupr vdr-2.8.1/eit.c vdr-2.8.1-mod/eit.c
---- vdr-2.8.1/eit.c	2026-03-21 23:55:01.896728739 +1000
-+++ vdr-2.8.1-mod/eit.c	2026-03-21 23:55:52.361291120 +1000
+diff -Nupr 1/vdr-2.8.2/eit.c 2/vdr-2.8.2/eit.c
+--- 1/vdr-2.8.2/eit.c	2026-06-06 00:11:02.595476901 +1000
++++ 2/vdr-2.8.2/eit.c	2026-08-20 10:17:37.306998210 +1000
 @@ -75,10 +75,10 @@ bool cEitTables::Processed(uchar TableId
  
  class cEIT : public SI::EIT {
@@ -268,9 +268,9 @@ diff -Nupr vdr-2.8.1/eit.c vdr-2.8.1-mod/eit.c
           }
           break;
      case 0x14: {
-diff -Nupr vdr-2.8.1/epg.c vdr-2.8.1-mod/epg.c
---- vdr-2.8.1/epg.c	2026-03-21 23:55:01.896728739 +1000
-+++ vdr-2.8.1-mod/epg.c	2026-03-21 23:55:52.362291072 +1000
+diff -Nupr 1/vdr-2.8.2/epg.c 2/vdr-2.8.2/epg.c
+--- 1/vdr-2.8.2/epg.c	2026-06-06 00:11:02.595476901 +1000
++++ 2/vdr-2.8.2/epg.c	2026-08-20 10:17:37.306998210 +1000
 @@ -941,9 +941,10 @@ Final:
  
  cMutex cSchedule::numTimersMutex;
@@ -345,9 +345,9 @@ diff -Nupr vdr-2.8.1/epg.c vdr-2.8.1-mod/epg.c
    if (!Channel->schedule)
       Channel->schedule = &DummySchedule;
    if (Channel->schedule == &DummySchedule && AddIfMissing) {
-diff -Nupr vdr-2.8.1/epg.h vdr-2.8.1-mod/epg.h
---- vdr-2.8.1/epg.h	2026-03-21 23:55:01.897728690 +1000
-+++ vdr-2.8.1-mod/epg.h	2026-03-21 23:55:52.362291072 +1000
+diff -Nupr 1/vdr-2.8.2/epg.h 2/vdr-2.8.2/epg.h
+--- 1/vdr-2.8.2/epg.h	2026-06-06 00:11:02.595476901 +1000
++++ 2/vdr-2.8.2/epg.h	2026-08-20 10:17:37.307998160 +1000
 @@ -157,6 +157,7 @@ class cSchedule : public cListObject  {
  private:
    static cMutex numTimersMutex; // Protects numTimers, because it might be accessed from parallel read locks
@@ -378,9 +378,9 @@ diff -Nupr vdr-2.8.1/epg.h vdr-2.8.1-mod/epg.h
    const cSchedule *GetSchedule(const cChannel *Channel, bool AddIfMissing = false) const;
    };
  
-diff -Nupr vdr-2.8.1/Make.config.template vdr-2.8.1-mod/Make.config.template
---- vdr-2.8.1/Make.config.template	2026-03-21 23:55:01.860730477 +1000
-+++ vdr-2.8.1-mod/Make.config.template	2026-03-21 23:55:52.362291072 +1000
+diff -Nupr 1/vdr-2.8.2/Make.config.template 2/vdr-2.8.2/Make.config.template
+--- 1/vdr-2.8.2/Make.config.template	2026-06-06 00:11:02.563478506 +1000
++++ 2/vdr-2.8.2/Make.config.template	2026-08-20 10:17:37.307998160 +1000
 @@ -93,6 +93,7 @@ LIRC_DEVICE = /var/run/lirc/lircd
  ### Define if you want 'systemd' notification:
  #SDNOTIFY = 1
@@ -389,10 +389,10 @@ diff -Nupr vdr-2.8.1/Make.config.template vdr-2.8.1-mod/Make.config.template
  ### Fallback for plugins with old makefiles:
  ifdef PLUGIN
  CFLAGS   += -fPIC
-diff -Nupr vdr-2.8.1/menu.c vdr-2.8.1-mod/menu.c
---- vdr-2.8.1/menu.c	2026-03-21 23:55:01.909728111 +1000
-+++ vdr-2.8.1-mod/menu.c	2026-03-21 23:55:52.363291024 +1000
-@@ -3994,6 +3994,7 @@ void cMenuSetupDVB::Setup(void)
+diff -Nupr 1/vdr-2.8.2/menu.c 2/vdr-2.8.2/menu.c
+--- 1/vdr-2.8.2/menu.c	2026-06-06 00:11:02.599476701 +1000
++++ 2/vdr-2.8.2/menu.c	2026-08-20 10:17:37.308998111 +1000
+@@ -3998,6 +3998,7 @@ void cMenuSetupDVB::Setup(void)
    if (data.VideoFormat == 0)
       Add(new cMenuEditStraItem(tr("Setup.DVB$Video display format"), &data.VideoDisplayFormat, 3, videoDisplayFormatTexts));
    Add(new cMenuEditBoolItem(tr("Setup.DVB$Use Dolby Digital"),     &data.UseDolbyDigital));
@@ -400,7 +400,7 @@ diff -Nupr vdr-2.8.1/menu.c vdr-2.8.1-mod/menu.c
    Add(new cMenuEditStraItem(tr("Setup.DVB$Update channels"),       &data.UpdateChannels, 6, updateChannelsTexts));
    Add(new cMenuEditIntItem( tr("Setup.DVB$Audio languages"),       &numAudioLanguages, 0, I18nLanguages()->Size()));
    for (int i = 0; i < numAudioLanguages; i++)
-@@ -4007,6 +4008,7 @@ void cMenuSetupDVB::Setup(void)
+@@ -4011,6 +4012,7 @@ void cMenuSetupDVB::Setup(void)
       Add(new cMenuEditIntItem(Indent(2, tr("Setup.DVB$Subtitle foreground transparency")), &data.SubtitleFgTransparency, 0, 9));
       Add(new cMenuEditIntItem(Indent(2, tr("Setup.DVB$Subtitle background transparency")), &data.SubtitleBgTransparency, 0, 10));
       }
@@ -408,9 +408,9 @@ diff -Nupr vdr-2.8.1/menu.c vdr-2.8.1-mod/menu.c
  
    SetCurrent(Get(current));
    Display();
-diff -Nupr vdr-2.8.1/nit.c vdr-2.8.1-mod/nit.c
---- vdr-2.8.1/nit.c	2026-03-21 23:55:01.910728062 +1000
-+++ vdr-2.8.1-mod/nit.c	2026-03-21 23:55:52.364290976 +1000
+diff -Nupr 1/vdr-2.8.2/nit.c 2/vdr-2.8.2/nit.c
+--- 1/vdr-2.8.2/nit.c	2026-06-06 00:11:02.600476651 +1000
++++ 2/vdr-2.8.2/nit.c	2026-08-20 10:17:37.308998111 +1000
 @@ -18,6 +18,8 @@
  
  #define DVB_SYSTEM_1 0 // see also dvbdevice.c
@@ -483,50 +483,77 @@ diff -Nupr vdr-2.8.1/nit.c vdr-2.8.1-mod/nit.c
                                    ChannelsModified |= Channel->SetLcn(lcn);
                                    break;
                                    }
-diff -Nupr vdr-2.8.1/pat.c vdr-2.8.1-mod/pat.c
---- vdr-2.8.1/pat.c	2026-03-21 23:55:01.911728014 +1000
-+++ vdr-2.8.1-mod/pat.c	2026-03-21 23:55:52.364290976 +1000
-@@ -643,6 +643,10 @@ void cPatFilter::Process(u_short Pid, u_
+diff -Nupr 1/vdr-2.8.2/pat.c 2/vdr-2.8.2/pat.c
+--- 1/vdr-2.8.2/pat.c	2026-06-06 00:11:02.601476600 +1000
++++ 2/vdr-2.8.2/pat.c	2026-08-20 11:21:40.753478980 +1000
+@@ -643,6 +643,11 @@ void cPatFilter::Process(u_short Pid, u_
                case 2: // STREAMTYPE_13818_VIDEO
                case 0x1B: // H.264
                case 0x24: // H.265
 +              case 0x42: // AVS+
 +              case 0x43: // AVS2
-+              case 0xD2: // AVS2
++              case 0xD2: // AVS2 (UHD)
 +              case 0xD4: // AVS3
++
                        Vpid = esPid;
                        Ppid = pmt.getPCRPid();
                        Vtype = stream.getStreamType();
-@@ -650,6 +654,7 @@ void cPatFilter::Process(u_short Pid, u_
-                       break;
-               case 3: // STREAMTYPE_11172_AUDIO
+@@ -652,6 +657,7 @@ void cPatFilter::Process(u_short Pid, u_
                case 4: // STREAMTYPE_13818_AUDIO
-+              case 0x05: // STREAMTYPE 0x44524131 DRA1
                case 0x0F: // ISO/IEC 13818-7 Audio with ADTS transport syntax
                case 0x11: // ISO/IEC 14496-3 Audio with LATM transport syntax
++              case 0xD3: // AVS3 AUDIO
                        {
-@@ -685,7 +690,7 @@ void cPatFilter::Process(u_short Pid, u_
-                       ProcessCaDescriptors = true;
+                       if (NumApids < MAXAPIDS) {
+                          Apids[NumApids] = esPid;
+@@ -691,6 +697,8 @@ void cPatFilter::Process(u_short Pid, u_
+                       {
+                       int dpid = 0;
+                       int dtype = 0;
++                      int apid = 0;
++                      int atype = 0;
+                       char lang[MAXLANGCODE1] = { 0 };
+                       SI::Descriptor *d;
+                       for (SI::Loop::Iterator it; (d = stream.streamDescriptors.getNext(it)); ) {
+@@ -732,6 +740,10 @@ void cPatFilter::Process(u_short Pid, u_
+                                  strn0cpy(lang, I18nNormalizeLanguageCode(ld->languageCode), MAXLANGCODE1);
+                                  }
+                                  break;
++                            case 0x05: // STREAMTYPE 0x44524131 DRA1
++                                 apid = stream.getPid();
++                                 atype = d->getDescriptorTag();
++                                 break;
+                             default: ;
+                             }
+                           delete d;
+@@ -744,6 +756,14 @@ void cPatFilter::Process(u_short Pid, u_
+                             NumDpids++;
+                             }
+                          }
++                      if (apid) {
++                         if (NumApids < MAXAPIDS) {
++                            Apids[NumApids] = apid;
++                            Atypes[NumApids] = atype;
++                            strn0cpy(ALangs[NumApids], lang, sizeof(ALangs[NumApids]));
++                            NumApids++;
++                            }
++                         }
                        }
                        break;
--              case 5: // STREAMTYPE_13818_PRIVATE
-+//              case 5: // STREAMTYPE_13818_PRIVATE
-               case 6: // STREAMTYPE_13818_PES_PRIVATE
-               //XXX case 8: // STREAMTYPE_13818_DSMCC
-                       {
-@@ -788,7 +793,8 @@ void cPatFilter::Process(u_short Pid, u_
+               case 0x80: // STREAMTYPE_USER_PRIVATE
+@@ -788,7 +808,8 @@ void cPatFilter::Process(u_short Pid, u_
                           }
                        // fall through
                case 0x83 ... 0x86: // STREAMTYPE_USER_PRIVATE
 -              case 0x88 ... 0xFF: // STREAMTYPE_USER_PRIVATE
-+              case 0x88 ... 0xD1: // STREAMTYPE_USER_PRIVATE
++              case 0x88 ... 0xD0: // STREAMTYPE_USER_PRIVATE
 +              case 0xD5 ... 0xFF: // STREAMTYPE_USER_PRIVATE
                        {
                        char lang[MAXLANGCODE1] = { 0 };
                        bool IsAc3 = false;
-diff -Nupr vdr-2.8.1/po/ru_RU.po vdr-2.8.1-mod/po/ru_RU.po
---- vdr-2.8.1/po/ru_RU.po	2026-03-21 23:55:01.915727821 +1000
-+++ vdr-2.8.1-mod/po/ru_RU.po	2026-03-21 23:55:52.364290976 +1000
+diff -Nupr 1/vdr-2.8.2/po/ru_RU.po 2/vdr-2.8.2/po/ru_RU.po
+--- 1/vdr-2.8.2/po/ru_RU.po	2026-06-06 00:11:02.605476400 +1000
++++ 2/vdr-2.8.2/po/ru_RU.po	2026-08-20 10:17:37.308998111 +1000
 @@ -1168,6 +1168,9 @@ msgstr "Широкоэкранное и�
  msgid "Setup.DVB$Use Dolby Digital"
  msgstr "Включить Dolby Digital"
@@ -547,28 +574,69 @@ diff -Nupr vdr-2.8.1/po/ru_RU.po vdr-2.8.1-mod/po/ru_RU.po
  msgid "LNB"
  msgstr "Конвертер"
  
-diff -Nupr vdr-2.8.1/remux.c vdr-2.8.1-mod/remux.c
---- vdr-2.8.1/remux.c	2026-03-21 23:55:01.919727628 +1000
-+++ vdr-2.8.1-mod/remux.c	2026-03-21 23:55:52.365290927 +1000
-@@ -725,12 +725,17 @@ void cPatPmtParser::ParsePmt(const uchar
+diff -Nupr 1/vdr-2.8.2/remux.c 2/vdr-2.8.2/remux.c
+--- 1/vdr-2.8.2/remux.c	2026-06-06 00:11:02.608476249 +1000
++++ 2/vdr-2.8.2/remux.c	2026-08-20 11:22:32.910107965 +1000
+@@ -727,6 +727,10 @@ void cPatPmtParser::ParsePmt(const uchar
             case 0x02: // STREAMTYPE_13818_VIDEO
             case 0x1B: // H.264
             case 0x24: // H.265
 +           case 0x42: // AVS+
 +           case 0x43: // AVS2
-+           case 0xD2: // AVS2
++           case 0xD2: // AVS2 (UHD)
 +           case 0xD4: // AVS3
                        vpid = stream.getPid();
                        vtype = stream.getStreamType();
                        ppid = Pmt.getPCRPid();
-                       break;
-            case 0x03: // STREAMTYPE_11172_AUDIO
+@@ -735,6 +739,7 @@ void cPatPmtParser::ParsePmt(const uchar
             case 0x04: // STREAMTYPE_13818_AUDIO
-+           case 0x05: // STREAMTYPE 0x44524131 DRA1
             case 0x0F: // ISO/IEC 13818-7 Audio with ADTS transport syntax
             case 0x11: // ISO/IEC 14496-3 Audio with LATM transport syntax
++           case 0xD3: // AVS3 AUDIO
                        {
-@@ -2157,6 +2162,60 @@ int cFrameChecker::TotalErrors(void)
+                       if (NumApids < MAXAPIDS) {
+                          apids[NumApids] = stream.getPid();
+@@ -776,6 +781,8 @@ void cPatPmtParser::ParsePmt(const uchar
+                       {
+                       int dpid = 0;
+                       int dtype = 0;
++                      int apid = 0;
++                      int atype = 0;
+                       char lang[MAXLANGCODE1] = "";
+                       SI::Descriptor *d;
+                       for (SI::Loop::Iterator it; (d = stream.streamDescriptors.getNext(it)); ) {
+@@ -824,6 +831,11 @@ void cPatPmtParser::ParsePmt(const uchar
+                                  strn0cpy(lang, I18nNormalizeLanguageCode(ld->languageCode), MAXLANGCODE1);
+                                  }
+                                  break;
++                            case 0x05: // STREAMTYPE 0x44524131 DRA1
++                                 dbgpatpmt(" DRA1");
++                                 apid = stream.getPid();
++                                 atype = d->getDescriptorTag();
++                                 break;
+                             default: ;
+                             }
+                           delete d;
+@@ -839,6 +851,18 @@ void cPatPmtParser::ParsePmt(const uchar
+                             dpids[NumDpids] = 0;
+                             }
+                          }
++                      if (apid) {
++                         if (NumApids < MAXAPIDS) {
++                            apids[NumApids] = apid;
++                            atypes[NumApids] = atype;
++                            strn0cpy(alangs[NumApids], lang, sizeof(alangs[NumApids]));
++                            if (updatePrimaryDevice)
++                                cDevice::PrimaryDevice()->SetAvailableTrack(ttAudio, NumApids, apids[NumApids], alangs[NumApids]);
++                            NumApids++;
++                            apids[NumApids] = 0;
++                            }
++                         }
++
+                       }
+                       break;
+            case 0x81: // STREAMTYPE_USER_PRIVATE - AC3 audio for ATSC and BD
+@@ -2159,6 +2183,60 @@ int cFrameChecker::TotalErrors(void)
    return tsChecker->Errors() + ptsChecker->Missing();
  }
  
@@ -629,7 +697,7 @@ diff -Nupr vdr-2.8.1/remux.c vdr-2.8.1-mod/remux.c
  // --- cFrameDetector --------------------------------------------------------
  
  const char *ScanTypeChars = "-pi";  // index is eScanType
-@@ -2208,7 +2267,8 @@ void cFrameDetector::SetPid(int Pid, int
+@@ -2210,7 +2288,8 @@ void cFrameDetector::SetPid(int Pid, int
  {
    pid = Pid;
    type = Type;
@@ -639,20 +707,18 @@ diff -Nupr vdr-2.8.1/remux.c vdr-2.8.1-mod/remux.c
    delete parser;
    parser = NULL;
    if (type == 0x01 || type == 0x02)
-@@ -2217,7 +2277,9 @@ void cFrameDetector::SetPid(int Pid, int
+@@ -2219,6 +2298,8 @@ void cFrameDetector::SetPid(int Pid, int
       parser = new cH264Parser;
    else if (type == 0x24)
       parser = new cH265Parser;
--  else if (type == 0x03 || type == 0x04 || type == 0x06) // MPEG audio or AC3 audio
 +  else if (type == 0x42 || type == 0x43 || type == 0xD2 || type == 0xD4) //CAVS, AVS2, AVS3
 +     parser = new cAVSParser;
-+  else if (type == 0x03 || type == 0x04 || type == 0x06 || type == 0x05) // MPEG audio or AC3 audio, DRA1
+   else if (type == 0x03 || type == 0x04 || type == 0x06) // MPEG audio or AC3 audio
       parser = new cAudioParser;
    else if (type != 0)
-      esyslog("ERROR: unknown stream type %d (PID %d) in frame detector", type, pid);
-diff -Nupr vdr-2.8.1/sdt.c vdr-2.8.1-mod/sdt.c
---- vdr-2.8.1/sdt.c	2026-03-21 23:55:01.920727579 +1000
-+++ vdr-2.8.1-mod/sdt.c	2026-03-21 23:55:52.365290927 +1000
+diff -Nupr 1/vdr-2.8.2/sdt.c 2/vdr-2.8.2/sdt.c
+--- 1/vdr-2.8.2/sdt.c	2026-06-06 00:11:02.609476199 +1000
++++ 2/vdr-2.8.2/sdt.c	2026-08-20 10:17:37.309998062 +1000
 @@ -93,7 +93,7 @@ void cSdtFilter::Process(u_short /*Pid*/
    bool TriggerPat = false;
    SI::SDT::Service SiSdtService;
